@@ -1,0 +1,42 @@
+"use client"
+import React, { useEffect, useState } from 'react'
+import { transactionSchema, transactionSchemaType } from '../schema/transactions'
+
+function page() {
+  const [allTransactions,setAllTransactions]=useState<transactionSchemaType|null|undefined>(null)
+  useEffect(()=>{
+    const transactions=localStorage.getItem("transactions")
+    if(!transactions){
+      setAllTransactions(undefined)
+      return
+    }
+    const result=transactionSchema.safeParse(JSON.parse(transactions))
+    console.log("helllllllllllllllllllllllllllllll")
+    console.log(result)
+    if(!result.success){
+      setAllTransactions(undefined)
+      return
+    }
+    setAllTransactions(JSON.parse(transactions) as transactionSchemaType)
+
+  },[])
+  if(allTransactions===null){
+    return <div>loading....</div>
+  }
+  if(allTransactions===undefined){
+    return <div>no transaction fund</div>
+  }
+  console.log("transactions",allTransactions)
+
+  return(
+    <div>
+      {
+        allTransactions.map((transaction)=>{
+          return <div>{transaction.otherParty}</div>
+        })
+      
+      }</div>
+  )
+}
+
+export default page
