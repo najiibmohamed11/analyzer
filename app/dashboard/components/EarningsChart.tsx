@@ -72,24 +72,59 @@ const getLastWeekTransactions=(transactions:transactionSchemaType)=>{
   function normalize(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
+/**
+ * Gets the start of the week (Monday) for a given date
+ * @param date - The date to get the week start for
+ * @returns A normalized date representing Monday of that week
+ */
+function getWeekStart(date: Date): Date {
+  const normalized = normalize(date);
+  const dayOfWeek = normalized.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  // Calculate days to subtract to get to Monday (0 = Monday)
+  // If Sunday (0), subtract 6 days; if Monday (1), subtract 0 days; etc.
+  const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const weekStart = new Date(normalized);
+  weekStart.setDate(weekStart.getDate() - daysToSubtract);
+  return normalize(weekStart);
+}
+
 function getLastMonthTransaction(transactions: transactionSchemaType) {
   const weekTransactionData: { day: string; income: number; expense: number }[] = [];
 
   // normalize today to midnight
   const today = normalize(new Date());
+  const currentWeekStart = getWeekStart(today);
+  
+  // Process 4 periods: this week, last week, 2 weeks ago, 3 weeks ago
+  for (let i = 0; i < 4; i++) {
+    let startDay: Date;
+    let endDay: Date;
+    let label: string;
 
-  for (let i = 4; i > 0; i--) {
-    const end = new Date(today);              // newest
-    end.setDate(end.getDate() - (i - 1) * 7);
-
-    const start = new Date(today);            // oldest
-    start.setDate(start.getDate() - i * 7);
-
-    // Normalize both
-    const startDay = normalize(start);
-    const endDay = normalize(end);
-
-    console.log("RANGE:", startDay, "→", endDay);
+    if (i === 0) {
+      // This week: from start of current week to today (inclusive)
+      startDay = currentWeekStart;
+      endDay = new Date(today);
+      endDay.setDate(endDay.getDate() + 1); // Make it exclusive for filtering
+      label = "This Week";
+    } else {
+      // Previous weeks: complete weeks (Monday to Sunday)
+      const weekStart = new Date(currentWeekStart);
+      weekStart.setDate(weekStart.getDate() - i * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 7); // End of week (exclusive)
+      
+      startDay = normalize(weekStart);
+      endDay = normalize(weekEnd);
+      
+      if (i === 1) {
+        label = "Last Week";
+      } else if (i === 2) {
+        label = "2 Weeks Ago";
+      } else {
+        label = "3 Weeks Ago";
+      }
+    }
 
     const sameRange = transactions.filter((t) => {
       const transactionDate = normalize(new Date(t.date));
@@ -98,9 +133,9 @@ function getLastMonthTransaction(transactions: transactionSchemaType) {
 
     const credit = sameRange.reduce((sum, t) => sum + t.credit, 0);
     const debit = sameRange.reduce((sum, t) => sum + t.debit, 0);
-    const label=i<=2?`${i===1?"this week":"last week"}`:`${getMonthAndDayName(startDay)} -- ${getMonthAndDayName(endDay)}`
+    
     weekTransactionData.push({
-      day:label ,
+      day: label,
       income: credit,
       expense: debit,
     });
