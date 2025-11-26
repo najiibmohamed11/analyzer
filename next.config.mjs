@@ -1,4 +1,4 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from '@sentry/nextjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -7,7 +7,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-};
+    serverExternalPackages: [
+    "require-in-the-middle",
+    "import-in-the-middle",
+    // potentially others like "@opentelemetry/instrumentation" if warnings persist
+  ],
+}
 
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
@@ -15,7 +20,7 @@ export default withSentryConfig(nextConfig, {
 
   org: "abdinajib-eb",
 
-  project: "javascript-nextjs",
+  project: "javascript-nextjs-0d",
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,

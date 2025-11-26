@@ -4,13 +4,18 @@ import pdf from "pdf-parse";
 import { groq } from "@ai-sdk/groq";
 import { generateObject } from "ai";
 import z from "zod";
+import * as Sentry from "@sentry/nextjs"; // Import Sentry
 
 export const POST = async (request: NextRequest) => {
   const form = await request.formData();
   const pdfFile = form.get("pdf-file") as File;
 
   if (!pdfFile) {
-    return NextResponse.json({ success: false, error: "No PDF provided" });
+    return NextResponse.json({
+      success: false,
+      error: "No PDF provided",
+      details: "",
+    });
   }
 
   try {
@@ -21,7 +26,7 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({
         success: false,
         error:
-          "this pdf id not pdf from waafi please get activity pdf from waafi",
+          "this pdf is not pdf from waafi please get activity pdf from waafi",
         details: "",
       });
     }
@@ -45,12 +50,17 @@ export const POST = async (request: NextRequest) => {
       details: "",
     });
   } catch (e) {
+    // 🟢 TELL SENTRY TO LOG THIS
+    Sentry.captureException(e);
     console.error("PDF parsing error:", e);
-    return NextResponse.json({
-      success: false,
-      error: "Parsing failed",
-      details: e instanceof Error ? e.message : "Unknown error",
-    });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "An internal server error occurred while parsing",
+        details: e instanceof Error ? e.message : "Unknown error",
+      },
+      { status: 500 }, // Set HTTP status to 500
+    );
   }
 };
 

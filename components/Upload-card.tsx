@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Spinner } from './ui/spinner'
 import { useRouter } from 'next/navigation'
 import { transactionSchemaType } from '@/app/schema/transactions'
+import * as Sentry from "@sentry/nextjs"; // 1. Import Sentry
 export type metaDataType=  { 
   period: string;
   name: string;
@@ -66,10 +67,11 @@ function UploadCard() {
             localStorage.setItem("metadata",JSON.stringify(result.data.arangedMetaData))
             navigator.push("/dashboard")
           } else {
-            toast.error(result.error || "Failed to parse PDF")
+            Sentry.captureException(result.error);
+            toast.error(result.error)
           }
         } catch (error) {
-          console.error("Upload error:", error)
+          Sentry.captureException(error);
           toast.error("Failed to upload PDF")
         }
       }
