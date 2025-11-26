@@ -60,7 +60,7 @@ export function ProfileSidebar({
 
               <div>
                 <h3 className="mb-6 text-lg font-bold text-slate-900">
-                  Your collection status
+                  Merchant Overview
                 </h3>
 
                 <MerchantsChart transactions={transactions} />
