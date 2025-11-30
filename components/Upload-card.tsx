@@ -5,7 +5,23 @@ import {useDropzone} from 'react-dropzone'
 import { toast } from 'sonner'
 import { Spinner } from './ui/spinner'
 import { useRouter } from 'next/navigation'
-
+import { transactionSchemaType } from '@/app/schema/transactions'
+import { metadata } from '@/app/layout'
+export type metaDataType=  { 
+  period: string;
+  name: string;
+  mobile: string;
+  balance: string;
+}
+type parsedPdfResult={
+  success:boolean,
+  data:{
+       results: transactionSchemaType
+       arangedMetaData:metaDataType
+    },
+   error: string,
+   details: string
+}
 function UploadCard() {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isLoading,setIsLoading]=useState(false)
@@ -43,13 +59,14 @@ function UploadCard() {
             body: formData
           })
 
-          const result = await response.json()
+          const result = await response.json() as parsedPdfResult
 
           if (result.success) {
             toast.success("PDF uploaded and parsed successfully")
             console.log("---- PDF TEXT ----")
-            console.log(result.text)
-            localStorage.setItem("transactions",JSON.stringify(result.data))
+            console.log(result.data.arangedMetaData)
+            localStorage.setItem("transactions",JSON.stringify(result.data.results))
+            localStorage.setItem("metadata",JSON.stringify(result.data.arangedMetaData))
             navigator.push("/dashboard")
           } else {
             toast.error(result.error || "Failed to parse PDF")

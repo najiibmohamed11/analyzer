@@ -114,6 +114,7 @@ const getStartOfWeek=(today:Date)=>{
 
 function getLastMonthTransaction(transactions: transactionSchemaType) {
   const weekTransactionData: { day: string; income: number; expense: number }[] = [];
+  console.log(transactions)
 
   // normalize today to midnight
   const today = normalize(new Date());
@@ -186,7 +187,7 @@ export function ChartBarMultiple({transactions}:{transactions:transactionSchemaT
   const lastweekTransactions=getLastWeekTransactions(transactions)
   const lastMonthTransactions=getLastMonthTransaction(transactions)
   return (
-    <Card>
+    <Card className="min-w-3xl ">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
       <CardTitle className="text-lg font-bold">Earnings</CardTitle>
         <Tabs className="w-auto" defaultValue={transactionsDateType} value={transactionsDateType} onValueChange={(value)=>setTransactionsDateType(value as 'week'|'month')}>

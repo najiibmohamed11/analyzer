@@ -19,6 +19,8 @@ export const POST = async (request: NextRequest) => {
    return NextResponse.json({
       success: true,
       data:stracturedPdfTxt,
+        error: "",
+        details: ""
     });
   } catch (e) {
     console.error("PDF parsing error:", e);
@@ -34,9 +36,15 @@ export const POST = async (request: NextRequest) => {
 function parseTransactions(text: string) {
   const blocks = text.split("TRANSACTION").slice(1);
   const results:transactionSchemaType = [];
+  const metaData=text.split("TRANSACTION")[0]
+  console.log('eeeeeeeeeeeeeeeee',metaData)
 
   const regex = /(\d{11,})\s+(\d{4}-\d{2}-)\s+(\d{2})\s+(\d{2}:\d{2}:\d{2})\s+(.+?)\$([\d.]+)\$([\d.]+)\$([\d.]+)([\s\S]*?)(?=\d{11,}|$)/g
+  const regexForMetaData=/Period:\s*(.+)\s*Name\s*(.+)\s*Mobile Number\s*(\d+)\s*Balance\s*([0-9.]+)/;
 
+const match = metaData.match(regexForMetaData);
+const [, period, name, mobile, balance] = match ?? []
+  const arangedMetaData={period,name,mobile,balance}
   for (const block of blocks) {
     let match;
     while ((match = regex.exec(block)) !== null) {
@@ -53,7 +61,7 @@ function parseTransactions(text: string) {
     }
   }
 
-  return results;
+  return {results,arangedMetaData};
 }
 
 
