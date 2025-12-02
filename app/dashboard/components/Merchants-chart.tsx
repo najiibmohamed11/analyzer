@@ -55,7 +55,7 @@ const getChartConfig=(transaction:transactionSchemaType)=>{
   const groupedMerchantTransaction=merchantTransactions.reduce((accumulator,transaction)=>{
    const indexOfTransaction=accumulator.findIndex((trans)=>trans.merchant===transaction.otherParty)
    if(indexOfTransaction===-1){
-    accumulator.push({merchant:transaction.otherParty,amount:transaction.debit,fill:getRandomColor()})
+    accumulator.push({merchant:transaction.otherParty,amount:transaction.debit,fill:`#${transaction.otherParty}`})
     return accumulator
    }
    accumulator[indexOfTransaction]={merchant:transaction.otherParty,amount:accumulator[indexOfTransaction].amount+transaction.debit,fill:getRandomColor()}  
@@ -63,6 +63,7 @@ const getChartConfig=(transaction:transactionSchemaType)=>{
     
   },[]as {merchant:string,amount:number,fill:string}[])
   console.log(groupedMerchantTransaction)
+  groupedMerchantTransaction.sort((a,b)=>b.amount-a.amount)
   return groupedMerchantTransaction
 }
 
@@ -73,15 +74,15 @@ export default function MerchantsChart({transactions}:{transactions:transactionS
   }, [])
 
   return (
-  <ChartContainer
+      <div className="flex items-center flex-col gap-4 j">
+        <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
+          className="w-[180px] h-[180px] ">
           <PieChart>
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
-            />
+            /> 
             <Pie
               data={chartConf}
               dataKey="amount"
@@ -123,6 +124,16 @@ export default function MerchantsChart({transactions}:{transactions:transactionS
             </Pie>
           </PieChart>
         </ChartContainer>
+        <div className="flex flex-col gap-2 items-start w-full ">
+    {chartConf.map((chart) => (
+      <div className="flex items-center gap-6" key={chart.merchant}>
+        <div className={`w-4 h-4 bg-[${chart.fill}] rounded-xl`} style={{backgroundColor:chart.fill}}/>
+        <div>{chart.merchant}</div>
+        <div>{chart.amount}</div>
+      </div>
+    ))}
+  </div>
+    </div>
    
   )
 }

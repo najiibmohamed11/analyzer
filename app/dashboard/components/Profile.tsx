@@ -22,7 +22,7 @@ export function ProfileSidebar({transactions}:{transactions:transactionSchemaTyp
   return (
     <div className="space-y-6 h-full flex flex-col">
       {/* Profile & Status Card */}
-      <Card className="flex-1 rounded-[2.5rem] border-0 bg-gradient-to-b from-white to-red-50/50 shadow-sm">
+      <Card className="flex-1 rounded-[2.5rem] border-0 from-white to-red-50/50 shadow-sm">
         <CardContent className="p-8 flex flex-col h-full">
          {!metaData?<Spinner/>: <div className="space-y-6">
             <div>
@@ -30,7 +30,7 @@ export function ProfileSidebar({transactions}:{transactions:transactionSchemaTyp
               <div className="flex items-center gap-4 rounded-2xl bg-white/50 p-2">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src="/avatar-woman-digital-artist.jpg" />
-                  <AvatarFallback>{generateProfileIcon(metaData.name)}</AvatarFallback>
+                  <AvatarFallback className="font-bold">{generateProfileIcon(metaData.name)}</AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="font-bold text-slate-900">{metaData.name}</div>
