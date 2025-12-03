@@ -48,24 +48,28 @@ function getRandomColor() {
   }
   return color;
 }
-
+const getMerChantOwnerName=(description:string)=>{
+  const regex=/merchant:\s*([\s\S]*?)\s*\(\d+\)/
+  const regexData=description.match(regex)
+  return regexData?.[1]??""
+}
 const getChartConfig=(transaction:transactionSchemaType)=>{
   const merchantTransactions=transaction.filter((transaction)=>transaction.type==="merchant")
   merchantTransactions.reverse()
   const groupedMerchantTransaction=merchantTransactions.reduce((accumulator,transaction)=>{
    const indexOfTransaction=accumulator.findIndex((trans)=>trans.merchant===transaction.otherParty)
    if(indexOfTransaction===-1){
-    accumulator.push({merchant:transaction.otherParty,amount:transaction.debit,fill:`#${transaction.otherParty}`})
+    accumulator.push({merchant:transaction.otherParty,amount:transaction.debit,fill:`#${transaction.otherParty}`,ownerName:getMerChantOwnerName(transaction.description)})
     return accumulator
    }
-   accumulator[indexOfTransaction]={merchant:transaction.otherParty,amount:accumulator[indexOfTransaction].amount+transaction.debit,fill:getRandomColor()}  
+   accumulator[indexOfTransaction]={merchant:transaction.otherParty,amount:accumulator[indexOfTransaction].amount+transaction.debit,fill:getRandomColor(),ownerName:getMerChantOwnerName(transaction.description)}  
     return accumulator;
     
-  },[]as {merchant:string,amount:number,fill:string}[])
+  },[]as {merchant:string,amount:number,fill:string,ownerName:string}[])
   console.log(groupedMerchantTransaction)
   groupedMerchantTransaction.sort((a,b)=>b.amount-a.amount)
   return groupedMerchantTransaction
-}
+} 
 
 export default function MerchantsChart({transactions}:{transactions:transactionSchemaType}) {
   const chartConf=getChartConfig(transactions)
@@ -124,15 +128,29 @@ export default function MerchantsChart({transactions}:{transactions:transactionS
             </Pie>
           </PieChart>
         </ChartContainer>
-        <div className="flex flex-col gap-2 items-start w-full ">
-    {chartConf.map((chart) => (
-      <div className="flex items-center gap-6" key={chart.merchant}>
-        <div className={`w-4 h-4 bg-[${chart.fill}] rounded-xl`} style={{backgroundColor:chart.fill}}/>
-        <div>{chart.merchant}</div>
-        <div>{chart.amount}</div>
-      </div>
-    ))}
-  </div>
+      <div className="flex flex-col gap-2 w-full">
+      {chartConf.map((chart) => (
+        <div className="flex items-center w-full gap-3" key={chart.merchant}>
+          
+          {/* Color Square */}
+          <div
+            className="w-4 h-4 rounded-xl"
+            style={{ backgroundColor: chart.fill }}
+          />
+
+          {/* Merchant Name wide to take space */}
+          <div className="flex-1 text-left">
+            {chart.ownerName}
+          </div>
+
+          {/* Amount aligned to far right */}
+          <div className="text-right font-medium">
+            {chart.amount}
+          </div>
+        </div>
+      ))}
+    </div>
+
     </div>
    
   )
