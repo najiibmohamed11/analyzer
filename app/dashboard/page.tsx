@@ -4,7 +4,7 @@ import { transactionSchema, transactionSchemaType } from '../schema/transactions
 import { DashboardHeader } from './components/Dashboard-header'
 import { ChartBarMultiple } from './components/EarningsChart'
 import { ProfileSidebar } from './components/Profile'
-
+import { TopContacts } from './components/TopContacts'
 function page() {
   const [allTransactions,setAllTransactions]=useState<transactionSchemaType|null|undefined>(null)
   useEffect(()=>{
@@ -36,8 +36,9 @@ function page() {
       <div className="mx-auto max-w-7xl">
         <DashboardHeader/>
          <div className="flex justify-between">
-          <main className=''>
+          <main className='space-y-6'>
         <ChartBarMultiple transactions={allTransactions}/>
+      <TopContacts transactions={allTransactions}/>
           </main>
 
         <ProfileSidebar transactions={allTransactions}/>

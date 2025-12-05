@@ -1,18 +1,50 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { ArrowUpRight, ArrowDownRight, Crown } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { transactionSchemaType } from "@/app/schema/transactions"
-import { getTopContacts } from "../utils/transactionUtils"
+// import { getTopContacts } from "../utils/transactionUtils"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Avater from "./Avater"
+import Link from "next/link"
 
 interface TopContactsProps {
   transactions: transactionSchemaType
 }
 
+const getTopContacts=(transactions:transactionSchemaType,limit:number=10)=>{
+    const toptTransaction=new Map<string,{otherPart:string,credit:number,debit:number,net:number,numberOfTransactions:number}>()
+    transactions.forEach((transaction)=>{
+      if(toptTransaction.has(transaction.otherParty)){
+        const otherPartInfo=toptTransaction.get(transaction.otherParty)
+        if(otherPartInfo===undefined)return
+        const credit=otherPartInfo.credit+transaction.credit
+        const debit=otherPartInfo.debit+transaction.debit
+        const otherPart=transaction.otherParty
+        const newData={otherPart,credit,debit,net:credit-debit,numberOfTransactions:otherPartInfo.numberOfTransactions+1}
+        toptTransaction.set(transaction.otherParty,newData)
+        return
+      }
+         const credit=transaction.credit
+        const debit=transaction.debit
+        const otherPart=transaction.otherParty
+      toptTransaction.set(transaction.otherParty,{otherPart,credit,debit,net:credit-debit,numberOfTransactions:1})
+    })
+    console.log(toptTransaction)
+
+    const topContacts=[...toptTransaction.values()]
+    topContacts.sort((a, b) => {
+    if (b.numberOfTransactions !== a.numberOfTransactions) {
+      return b.numberOfTransactions - a.numberOfTransactions
+    }
+    return Math.abs(b.net) - Math.abs(a.net)
+  })
+    return topContacts
+}
 export function TopContacts({ transactions }: TopContactsProps) {
   const router = useRouter()
-  const topContacts = getTopContacts(transactions, 10)
+  const topContacts = getTopContacts(transactions,5 )
 
   const handleContactClick = (contactName: string) => {
     const encodedName = encodeURIComponent(contactName)
@@ -32,31 +64,6 @@ export function TopContacts({ transactions }: TopContactsProps) {
     )
   }
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }
-
-  const getContactColor = (index: number) => {
-    const colors = [
-      "bg-blue-100 text-blue-700",
-      "bg-green-100 text-green-700",
-      "bg-purple-100 text-purple-700",
-      "bg-pink-100 text-pink-700",
-      "bg-yellow-100 text-yellow-700",
-      "bg-indigo-100 text-indigo-700",
-      "bg-red-100 text-red-700",
-      "bg-teal-100 text-teal-700",
-      "bg-orange-100 text-orange-700",
-      "bg-cyan-100 text-cyan-700",
-    ]
-    return colors[index % colors.length]
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -65,41 +72,40 @@ export function TopContacts({ transactions }: TopContactsProps) {
       <CardContent>
         <div className="space-y-3">
           {topContacts.map((contact, index) => (
-            <div
-              key={contact.name}
-              onClick={() => handleContactClick(contact.name)}
+            <Link
+            href={`/dashboard/contact/${contact.otherPart}`}
+              key={contact.otherPart}
+              onClick={() => handleContactClick(contact.otherPart)}
               className="flex items-center gap-4 p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all group"
             >
-              <div className={`${getContactColor(index)} w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0`}>
-                {getInitials(contact.name)}
-              </div>
+            <Avater id={contact.otherPart} size="md" pattern="rings" />
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-slate-900 truncate">{contact.name}</p>
+                <p className="font-semibold text-slate-900 truncate flex gap-1">{contact.otherPart}{index==0&&<Crown className="text-orange-600" />}</p>
                 <div className="flex items-center gap-4 mt-1">
                   <span className="text-xs text-slate-500">
-                    {contact.transactionCount} {contact.transactionCount === 1 ? 'transaction' : 'transactions'}
+                    {contact.numberOfTransactions} {contact.numberOfTransactions === 1 ? 'transaction' : 'transactions'}
                   </span>
                 </div>
               </div>
               <div className="flex flex-col items-end flex-shrink-0">
-                {contact.netAmount >= 0 ? (
+                {contact.net >= 0 ? (
                   <div className="flex items-center gap-1 text-green-600">
                     <ArrowUpRight className="h-4 w-4" />
                     <span className="font-semibold text-sm">
-                      ${Math.abs(contact.netAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      ${Math.abs(contact.net).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 text-red-600">
                     <ArrowDownRight className="h-4 w-4" />
                     <span className="font-semibold text-sm">
-                      ${Math.abs(contact.netAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      ${Math.abs(contact.net).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                 )}
                 <span className="text-xs text-slate-500 mt-1">Net</span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </CardContent>
