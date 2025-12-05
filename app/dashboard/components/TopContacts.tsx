@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { transactionSchemaType } from "@/app/schema/transactions"
 // import { getTopContacts } from "../utils/transactionUtils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import Avater from "./Avater"
 import Link from "next/link"
+import ProfileAvatar from "./ProfileAvatar"
 
 interface TopContactsProps {
   transactions: transactionSchemaType
@@ -78,7 +78,7 @@ export function TopContacts({ transactions }: TopContactsProps) {
               onClick={() => handleContactClick(contact.otherPart)}
               className="flex items-center gap-4 p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all group"
             >
-            <Avater id={contact.otherPart} size="md" pattern="rings" />
+            <ProfileAvatar id={contact.otherPart} size="md" pattern="rings" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-slate-900 truncate flex gap-1">{contact.otherPart}{index==0&&<Crown className="text-orange-600" />}</p>
                 <div className="flex items-center gap-4 mt-1">
