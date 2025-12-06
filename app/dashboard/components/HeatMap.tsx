@@ -15,7 +15,6 @@ const groupTransactions=(transactions:transactionSchemaType)=>{
       const groupedTransactionsData=groupedTransactions.get(date)
       if(!groupedTransactionsData)return 
       const transactionCount=groupedTransactionsData.transactionCount+1
-      console.log(";;;;;;;;;;;;;;;;;;;",transactionCount)
       const credit=groupedTransactionsData.credit+transaction.credit
       const debit=groupedTransactionsData.debit+transaction.debit
       const net =credit-debit
@@ -55,16 +54,16 @@ function HeatMap({transactions}:{transactions:transactionSchemaType}) {
       return today
     })
     containers.reverse()
-     const daysInTheWeek=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+     const daysInTheWeek=containers.slice(0,7)
 
   return (
     <div className='grid grid-cols-7 gap-1 '>
-        {daysInTheWeek.map((day)=><div className='h-5 text-center'>{day}</div>)}
+        {daysInTheWeek.map((day)=><div className='h-5 text-center'>{day.toLocaleDateString('en-us',{weekday:"short"})}</div>)}
       
         {containers.map((date)=>
     <HoverCard>
         <HoverCardTrigger asChild>
-          <div className={`h-10`} style={{backgroundColor:getContainerColor(date,transactions)}}></div></HoverCardTrigger>
+          <div className={`h-10`} style={{backgroundColor:getContainerColor(date,transactions)}}>{date.toLocaleDateString('en-us',{weekday:"short"})}</div></HoverCardTrigger>
          <HoverCardContentComponent transactions={transactions} date={date}/>
     </HoverCard>
       )}
