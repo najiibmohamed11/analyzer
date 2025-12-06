@@ -1,4 +1,7 @@
 import { transactionSchemaType } from '@/app/schema/transactions'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { ArrowLeftRight, Calendar, Minus, Plus, TrendingDown, TrendingUp } from 'lucide-react'
 import React from 'react'
 const groupTransactions=(transactions:transactionSchemaType)=>{
   //0 #FFE8E6
@@ -34,9 +37,14 @@ const getContainerColor=(date:Date,transactions:transactionSchemaType)=>{
     console.log("mmmmmmmmmmmmmm",myObject)
     if(!thidDateTransaction)return '#f5f7fa '
     console.log("transaction count",thidDateTransaction?.transactionCount)
-    if(thidDateTransaction.transactionCount<=2)return '#FFC0B8'
-    if(thidDateTransaction.transactionCount>=5)return '#FF6B58'
-    if(thidDateTransaction.transactionCount>=6)return '#FF462E'
+    if(thidDateTransaction.transactionCount<=2){
+      return '#FFC0B8'
+    }else if(thidDateTransaction.transactionCount<=5){
+      return '#FF6B58'
+    }else if(thidDateTransaction.transactionCount>=6)
+    {
+      return '#FF462E'
+    }
     return '#FFE8E6'
 }
 function HeatMap({transactions}:{transactions:transactionSchemaType}) {
@@ -52,10 +60,46 @@ function HeatMap({transactions}:{transactions:transactionSchemaType}) {
   return (
     <div className='grid grid-cols-7 gap-1 '>
         {daysInTheWeek.map((day)=><div className='h-5 text-center'>{day}</div>)}
-        {containers.map((i)=><div className={`  h-10`} style={{backgroundColor:getContainerColor(i,transactions)}}></div>)}
+      
+        {containers.map((date)=>
+    <HoverCard>
+        <HoverCardTrigger asChild>
+          <div className={`h-10`} style={{backgroundColor:getContainerColor(date,transactions)}}></div></HoverCardTrigger>
+         <HoverCardContentComponent transactions={transactions} date={date}/>
+    </HoverCard>
+      )}
+      
     </div>
   
   )
 }
 
 export default HeatMap
+
+
+const HoverCardContentComponent=({date,transactions}:{date:Date,transactions:transactionSchemaType})=>{
+const transactionsMap=groupTransactions(transactions)
+  const formatedDate=date.toISOString().split("T")[0]
+    const thidDateTransaction=transactionsMap.get(formatedDate)
+    return(
+           <HoverCardContent className="p-4 rounded-xl shadow-md bg-white space-y-4">
+  <div className="flex justify-between items-center">
+    <p className="flex items-center gap-2 text-sm text-gray-700">
+      <Calendar className="w-4 h-4" /> {date.toLocaleDateString()}
+    </p>
+    <p className="flex items-center gap-2 text-sm font-semibold text-green-600">
+      <TrendingUp className="w-4 h-4" /> ${thidDateTransaction?.credit??0}
+    </p>
+  </div>
+
+  <div className="flex justify-between items-center border-t pt-3">
+    <p className="flex items-center gap-2 text-sm text-gray-700">
+      <ArrowLeftRight className="w-4 h-4" /> {thidDateTransaction?.transactionCount??"no transaction"} transactions
+    </p>
+    <p className="flex items-center gap-2 text-sm font-semibold text-red-600">
+      <TrendingDown className="w-4 h-4" /> ${thidDateTransaction?.debit??0}
+    </p>
+  </div>
+</HoverCardContent>
+    )
+}

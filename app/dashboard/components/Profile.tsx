@@ -94,14 +94,3 @@ export function ProfileSidebar({transactions}:{transactions:transactionSchemaTyp
 }
 
 
-const AppPromoCard = () => {
-  return (
-    // Outer Container for centering on screen (optional)
-    <Card className="flex  w-full items-center justify-center bg-gray-900 p-4">
-      
-      {/* Main Orange Card Container */}
-    
-    </Card>
-  );
-};
-
