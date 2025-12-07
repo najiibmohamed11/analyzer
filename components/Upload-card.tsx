@@ -30,7 +30,7 @@ function UploadCard() {
        await processFiles(acceptedFiles[0])
        setIsLoading(false) 
   }, [])
-  const {getRootProps, getInputProps,isDragActive} = useDropzone({onDrop,disabled:isLoading})
+  const {getRootProps, getInputProps,isDragActive,} = useDropzone({onDrop,disabled:isLoading,noClick:true})
   const navigator=useRouter()
 
 
