@@ -223,27 +223,14 @@ export function ChartBarMultiple({transactions}:{transactions:transactionSchemaT
     data={transactionsDateType === "week" ? lastweekTransactions : lastMonthTransactions}
   >
 
-    <defs>
-      {/* Expense Gradient */}
-      <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="oklch(0.75 0.17 27)" />
-        <stop offset="100%" stopColor="oklch(0.71 0.17 28)" />
-      </linearGradient>
-
-      {/* Income Gradient */}
-      <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="oklch(0.85 0.14 130)" />
-        <stop offset="100%" stopColor="oklch(0.78 0.12 130)" />
-      </linearGradient>
-    </defs>
 
     <CartesianGrid vertical={false} />
     <XAxis dataKey="day" tickLine={false} tickMargin={10} axisLine={false} />
 
     <ChartTooltip cursor content={<ChartTooltipContent indicator="dashed" />} />
 
-    <Bar dataKey="expense" fill="url(#expenseGradient)" radius={4} />
-    <Bar dataKey="income" fill="url(#incomeGradient)" radius={4} />
+    <Bar dataKey="expense" fill="#F54927" radius={4} />
+    <Bar dataKey="income" fill="#076B1B" radius={4} />
 
   </BarChart>
 </ChartContainer>
