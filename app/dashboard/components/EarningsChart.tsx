@@ -1,7 +1,7 @@
 "use client"
 
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis, LineChart, Line, YAxis } from "recharts"
 
 import {
   Card,
@@ -39,6 +39,10 @@ const chartConfig = {
     label: "expense",
     color: "var(--chart-2)",
   },
+  balance: {
+    label: "balance",
+    color: "var(--chart-3)",
+  },
 } satisfies ChartConfig
 const formatDate = (d: Date) =>
   d.toISOString().split("T")[0]
@@ -71,20 +75,14 @@ const getLastWeekTransactions=(transactions:transactionSchemaType)=>{
   function normalize(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
-/**
- * Gets the start of the week (Monday) for a given date
- * @param date - The date to get the week start for
- * @returns A normalized date representing Monday of that week
- */
-function getWeekStart(date: Date): Date {
-  const normalized = normalize(date);
-  const dayOfWeek = normalized.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  // Calculate days to subtract to get to Monday (0 = Monday)
-  // If Sunday (0), subtract 6 days; if Monday (1), subtract 0 days; etc.
-  const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const weekStart = new Date(normalized);
-  weekStart.setDate(weekStart.getDate() - daysToSubtract);
-  return normalize(weekStart);
+
+// Helper function to get days into current week (Friday-based)
+// Returns 0 for Friday, 1 for Saturday, ..., 6 for Thursday
+function getDaysIntoWeek(date: Date): number {
+  // JavaScript: Sunday=0, Monday=1, ..., Friday=5, Saturday=6
+  // We want: Friday=0, Saturday=1, ..., Thursday=6
+  // Formula: (getDay() + 2) % 7
+  return (date.getDay() + 2) % 7;
 }
 
 const getTransactionsWeNeed = (
@@ -154,6 +152,12 @@ function getLastMonthTransaction(transactions: transactionSchemaType) {
 
     console.log("RANGE:", normalizedStart, "→", normalizedEnd, `(Week ${i}, days into week: ${daysIntoWeek})`);
 
+    // Normalize both
+    const normalizedStart = normalize(startDay);
+    const normalizedEnd = normalize(endDay);
+
+    console.log("RANGE:", normalizedStart, "→", normalizedEnd, `(Week ${i}, days into week: ${daysIntoWeek})`);
+
     const sameRange = transactions.filter((t) => {
       const transactionDate = normalize(new Date(t.date.split(" ")[0]));
       return transactionDate >= normalizedStart && transactionDate < normalizedEnd;
@@ -188,6 +192,13 @@ export function ChartBarMultiple({transactions}:{transactions:transactionSchemaT
   const [chartType,setChartType]=useState<'Earnings'|'Activity'>('Earnings')
   const lastweekTransactions=getLastWeekTransactions(transactions)
   const lastMonthTransactions=getLastMonthTransaction(transactions)
+  const balanceWeekData = getBalanceOverTimeWeek(transactions)
+  const balanceMonthData = getBalanceOverTimeMonth(transactions)
+  
+  const chartTitle = chartType === 'line' ? 'Balance' : 'Earnings'
+  const balanceData = transactionsDateType === 'week' ? balanceWeekData : balanceMonthData
+  const earningsData = transactionsDateType === 'week' ? lastweekTransactions : lastMonthTransactions
+  
   return (
     <div className="min-w-3xl ">
       <div className="flex justify-between w-full items-center">

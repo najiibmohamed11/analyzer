@@ -7,6 +7,7 @@ import { ProfileSidebar } from './components/Profile'
 import { TopContacts } from './components/TopContacts'
 function page() {
   const [allTransactions,setAllTransactions]=useState<transactionSchemaType|null|undefined>(null)
+
   useEffect(()=>{
     const transactions=localStorage.getItem("transactions")
     if(!transactions){
@@ -23,11 +24,27 @@ function page() {
     setAllTransactions(JSON.parse(transactions) as transactionSchemaType)
 
   },[])
+
+
   if(allTransactions===null){
-    return <div>loading....</div>
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading transactions...</p>
+        </div>
+      </div>
+    )
   }
   if(allTransactions===undefined){
-    return <div>no transaction fund</div>
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-600 text-lg">No transactions found</p>
+          <p className="text-slate-500 text-sm mt-2">Upload a PDF to get started</p>
+        </div>
+      </div>
+    )
   }
   console.log("transactions",allTransactions)
 
