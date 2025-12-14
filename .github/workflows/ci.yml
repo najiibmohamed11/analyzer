@@ -8,8 +8,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: clone the repo  
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -24,8 +23,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: pnpm run lint
+        run: pnpm lint
 
       - name: Run Prettier check
-        run: pnpx prettier --check .
-
+        run: pnpm exec prettier --check .
