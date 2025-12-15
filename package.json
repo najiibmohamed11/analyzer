@@ -8,7 +8,6 @@
     "lint": "eslint .",
     "start": "next start"
   },
-  "packageManager": "pnpm@9.12.0",
   "dependencies": {
     "@ai-sdk/google": "^2.0.44",
     "@emotion/is-prop-valid": "latest",
