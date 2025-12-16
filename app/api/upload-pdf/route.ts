@@ -1,4 +1,4 @@
-import { transactionSchema, transactionSchemaType } from "@/app/schema/transactions";
+import {  transactionSchemaType } from "@/app/schema/transactions";
 import { NextRequest, NextResponse } from "next/server";
 import pdf from "pdf-parse";
 import { groq } from '@ai-sdk/groq';
