@@ -1,6 +1,10 @@
-import { transactionSchemaType } from "@/app/schema/transactions";
+import { transactionSchema, transactionSchemaType } from "@/app/schema/transactions";
 import { NextRequest, NextResponse } from "next/server";
 import pdf from "pdf-parse";
+import { groq } from '@ai-sdk/groq';
+import { generateObject } from 'ai';
+import z from "zod";
+
 
 export const POST = async (request: NextRequest) => {
   const form = await request.formData();
@@ -13,7 +17,16 @@ export const POST = async (request: NextRequest) => {
   try {
     const binary = Buffer.from(await pdfFile.arrayBuffer());
     const loader = await pdf(binary);
-    const stracturedPdfTxt = parseTransactions(loader.text);
+    const stracturedPdfTxt = parseTransactionsWithRegex(loader.text);
+    if(stracturedPdfTxt.results.length===0 && stracturedPdfTxt.arangedMetaData.name){
+      const stracturedTransactions =await parseTransactionsWithAi(loader.text)
+      return NextResponse.json({
+      success: true,
+      data: {results:stracturedTransactions,arangedMetaData:stracturedPdfTxt.arangedMetaData},
+      error: "",
+      details: "",
+    });
+    }
 
     return NextResponse.json({
       success: true,
@@ -31,7 +44,7 @@ export const POST = async (request: NextRequest) => {
   }
 };
 
-function parseTransactions(text: string) {
+function parseTransactionsWithRegex(text: string) {
   const blocks = text.split("TRANSACTION").slice(1);
   const results: transactionSchemaType = [];
   const metaData = text.split("TRANSACTION")[0];
@@ -40,10 +53,8 @@ function parseTransactions(text: string) {
     /(\d{11,})\s+(\d{4}-\d{2}-)\s+(\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([\s\S]+?)\$([\d.]+)\$([\d.]+)\$([\d.]+)([\s\S]*?)(?=\n\s*\d{11,}\s+\d{4}-\d{2}-|\n\s*Total:|This is an automatically generated report\.|$)/g;
   const regexForMetaData =
     /Period:\s*(.+)\s*Name\s*(.+)\s*Mobile Number\s*(\d+)\s*Balance\s*([0-9.]+)/;
-  console.log(text);
   const match = metaData.match(regexForMetaData);
   const [, period, name, mobile, balance] = match ?? [];
-  console.log(blocks);
   const arangedMetaData = { period, name, mobile, balance };
   for (const block of blocks) {
     let match;
@@ -60,7 +71,6 @@ function parseTransactions(text: string) {
       });
     }
   }
-  console.log(results);
 
   return { results, arangedMetaData };
 }
@@ -80,3 +90,36 @@ const getTransactionType = (otherPart: string) => {
     return "unknown";
   }
 };
+
+const parseTransactionsWithAi=async(text:string)=>{
+  console.log("ai function runed")
+  const blocks = text.split("TRANSACTION").slice(1);
+
+
+const results = await generateObject({
+  model: groq('openai/gpt-oss-120b'),
+  output:"array",
+  schema:  z.object({
+      id: z.number(),
+      date: z.string(), // YYYY-MM-DD HH:MM:SS
+      type: z.enum([
+        "bank",
+        "p2p",
+        "merchant",
+        "API",
+        "internal purchase",
+        "unknown",
+      ]),
+      otherParty: z.string(),
+      credit: z.number(),
+      debit: z.number(),
+      balance: z.number(),
+      description: z.string(),
+    }),
+  prompt: `convert this text into stractured schema ${blocks.join("")}`,
+});
+
+console.log(JSON.stringify(results.object, null, 2));
+console.log(results)
+return results.object
+}
