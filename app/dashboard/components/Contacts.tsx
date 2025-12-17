@@ -4,15 +4,17 @@ import { useRouter } from "next/navigation";
 import { ArrowUpRight, ArrowDownRight, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { transactionSchemaType } from "@/app/schema/transactions";
-// import { getTopContacts } from "../utils/transactionUtils"
+// import { getContacts } from "../utils/transactionUtils"
 import Link from "next/link";
 import ProfileAvatar from "./ProfileAvatar";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
-interface TopContactsProps {
+interface ContactsProps {
   transactions: transactionSchemaType;
 }
 
-const getTopContacts = (
+const getContacts = (
   transactions: transactionSchemaType,
   // limit: number = 10,
 ) => {
@@ -56,25 +58,30 @@ const getTopContacts = (
   });
   console.log(toptTransaction);
 
-  const topContacts = [...toptTransaction.values()];
-  topContacts.sort((a, b) => {
+  const Contacts = [...toptTransaction.values()];
+  Contacts.sort((a, b) => {
     if (b.numberOfTransactions !== a.numberOfTransactions) {
       return b.numberOfTransactions - a.numberOfTransactions;
     }
     return Math.abs(b.net) - Math.abs(a.net);
   });
-  return topContacts;
+  return Contacts;
 };
-export function TopContacts({ transactions }: TopContactsProps) {
+export function Contacts({ transactions }: ContactsProps) {
   const router = useRouter();
-  const topContacts = getTopContacts(transactions, 5);
-
+  const [search, setSearch] = useState("");
+  const allContacts = getContacts(transactions);
+  const contacts = search
+    ? allContacts.filter((contact) =>
+        contact.otherParty.toLowerCase().includes(search.toLocaleLowerCase()),
+      )
+    : allContacts;
   const handleContactClick = (contactName: string) => {
     const encodedName = encodeURIComponent(contactName);
     router.push(`/dashboard/contact/${encodedName}`);
   };
 
-  if (topContacts.length === 0) {
+  if (allContacts.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -92,11 +99,19 @@ export function TopContacts({ transactions }: TopContactsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg font-bold">Top Contacts</CardTitle>
+        <CardTitle className="flex justify-between">
+          <h1 className="text-lg font-bold">Contacts</h1>
+          <Input
+            type="text"
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-72"
+            placeholder="search contact ...."
+          />
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-h-96 ">
         <div className="space-y-3">
-          {topContacts.map((contact, index) => (
+          {contacts.map((contact, index) => (
             <Link
               href={`/dashboard/contact/${contact.otherParty}`}
               key={contact.otherParty}
