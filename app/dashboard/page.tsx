@@ -8,6 +8,8 @@ import { DashboardHeader } from "./components/Dashboard-header";
 import { ChartBarMultiple } from "./components/EarningsChart";
 import { ProfileSidebar } from "./components/Profile";
 import { TopContacts } from "./components/TopContacts";
+import { DashboardSkeleton } from "./components/DashboardSkeleton";
+import { EmptyState } from "./components/EmptyDashboard";
 function page() {
   const [allTransactions, setAllTransactions] = useState<
     transactionSchemaType | null | undefined
@@ -26,10 +28,10 @@ function page() {
     setAllTransactions(JSON.parse(transactions) as transactionSchemaType);
   }, []);
   if (allTransactions === null) {
-    return <div>loading....</div>;
+    return <DashboardSkeleton/>;
   }
   if (allTransactions === undefined) {
-    return <div>no transaction fund</div>;
+    return <EmptyState/>;
   }
 
   return (
