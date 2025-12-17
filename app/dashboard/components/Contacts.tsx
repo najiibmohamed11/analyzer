@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { ArrowUpRight, ArrowDownRight, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { transactionSchemaType } from "@/app/schema/transactions";
@@ -56,7 +55,6 @@ const getContacts = (
       numberOfTransactions: 1,
     });
   });
-  console.log(toptTransaction);
 
   const Contacts = [...toptTransaction.values()];
   Contacts.sort((a, b) => {
@@ -68,7 +66,6 @@ const getContacts = (
   return Contacts;
 };
 export function Contacts({ transactions }: ContactsProps) {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const allContacts = getContacts(transactions);
   const contacts = search
@@ -76,10 +73,6 @@ export function Contacts({ transactions }: ContactsProps) {
         contact.otherParty.toLowerCase().includes(search.toLocaleLowerCase()),
       )
     : allContacts;
-  const handleContactClick = (contactName: string) => {
-    const encodedName = encodeURIComponent(contactName);
-    router.push(`/dashboard/contact/${encodedName}`);
-  };
 
   if (allContacts.length === 0) {
     return (
@@ -115,7 +108,6 @@ export function Contacts({ transactions }: ContactsProps) {
             <Link
               href={`/dashboard/contact/${contact.otherParty}`}
               key={contact.otherParty}
-              onClick={() => handleContactClick(contact.otherParty)}
               className="flex items-center gap-4 p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all group"
             >
               <ProfileAvatar
