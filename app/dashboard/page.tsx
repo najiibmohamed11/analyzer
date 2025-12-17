@@ -7,7 +7,7 @@ import {
 import { DashboardHeader } from "./components/Dashboard-header";
 import { ChartBarMultiple } from "./components/EarningsChart";
 import { ProfileSidebar } from "./components/Profile";
-import { TopContacts } from "./components/TopContacts";
+import { Contacts } from "./components/Contacts";
 import { DashboardSkeleton } from "./components/DashboardSkeleton";
 import { EmptyState } from "./components/EmptyDashboard";
 function page() {
@@ -41,7 +41,7 @@ function page() {
         <div className="flex justify-between">
           <main className="space-y-6">
             <ChartBarMultiple transactions={allTransactions} />
-            <TopContacts transactions={allTransactions} />
+            <Contacts transactions={allTransactions} />
           </main>
 
           <ProfileSidebar transactions={allTransactions} />
