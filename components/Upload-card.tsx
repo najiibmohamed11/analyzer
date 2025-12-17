@@ -120,9 +120,7 @@ function UploadCard() {
                 Upload Files
               </button>
     
-              <div className="absolute bottom-4 text-xs text-gray-400 font-medium pointer-events-none">
-                1MB or less.
-              </div>
+         
               </>}
             </div>
     

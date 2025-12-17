@@ -5,7 +5,7 @@ import { ConnectedUpload } from "./connected-upload"
 import { Toaster } from "sonner"
 
 
-export function LandingPage() {
+export function UploadPdfClient() {
   return (
     <main className="min-h-screen w-full bg-[#FDFDFD] flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans selection:bg-gray-200">
       <Toaster position="top-center" />
