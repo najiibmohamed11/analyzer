@@ -69,9 +69,13 @@ const getContacts = (
 };
 export function Contacts({ transactions }: ContactsProps) {
   const router = useRouter();
-  const [search,setSearch]=useState("")
+  const [search, setSearch] = useState("");
   const allContacts = getContacts(transactions);
-  const contacts=search?allContacts.filter((contact)=>contact.otherParty.toLowerCase().includes(search.toLocaleLowerCase())):allContacts
+  const contacts = search
+    ? allContacts.filter((contact) =>
+        contact.otherParty.toLowerCase().includes(search.toLocaleLowerCase()),
+      )
+    : allContacts;
   const handleContactClick = (contactName: string) => {
     const encodedName = encodeURIComponent(contactName);
     router.push(`/dashboard/contact/${encodedName}`);
@@ -96,11 +100,14 @@ export function Contacts({ transactions }: ContactsProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex justify-between">
-          <h1 className="text-lg font-bold">
-          Contacts
-          </h1>
-          <Input type="text" onChange={(e)=>setSearch(e.target.value)} className="w-72" placeholder="search contact ...."/>
-          </CardTitle>
+          <h1 className="text-lg font-bold">Contacts</h1>
+          <Input
+            type="text"
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-72"
+            placeholder="search contact ...."
+          />
+        </CardTitle>
       </CardHeader>
       <CardContent className="min-h-96 ">
         <div className="space-y-3">
