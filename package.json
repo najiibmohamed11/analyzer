@@ -6,7 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint ./app",
-    "start": "next start"
+    "start": "next start",
+    "format-check": "pnpm prettier --check ./app",
+    "format": "pnpm prettier --write ./app"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.44",
