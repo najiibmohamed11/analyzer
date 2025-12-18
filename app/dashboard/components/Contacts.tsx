@@ -102,13 +102,13 @@ export function Contacts({ transactions }: ContactsProps) {
           />
         </CardTitle>
       </CardHeader>
-      <CardContent className="min-h-96 ">
+      <CardContent className="min-h-96">
         <div className="space-y-3">
           {contacts.map((contact, index) => (
             <Link
               href={`/dashboard/contact/${contact.otherParty}`}
               key={contact.otherParty}
-              className="flex items-center gap-4 p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-all group"
+              className="group flex cursor-pointer items-center gap-4 rounded-lg border border-slate-200 p-4 transition-all hover:border-slate-300 hover:bg-slate-50"
             >
               <ProfileAvatar
                 id={contact.otherParty}
