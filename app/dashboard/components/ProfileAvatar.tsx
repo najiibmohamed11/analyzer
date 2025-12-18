@@ -80,8 +80,8 @@ const ProfileAvatar = ({
       >
         <img
           src={avatarUrl}
-          className="h-full w-full rounded-lg object-cover"
-          alt="Generated Avatar"
+          className="h-full w-full object-cover rounded-lg"
+          alt=""
         />
       </AvatarFallback>
     </Avatar>

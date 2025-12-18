@@ -7,7 +7,9 @@ import {
 import { DashboardHeader } from "./components/Dashboard-header";
 import { ChartBarMultiple } from "./components/EarningsChart";
 import { ProfileSidebar } from "./components/Profile";
-import { TopContacts } from "./components/TopContacts";
+import { Contacts } from "./components/Contacts";
+import { DashboardSkeleton } from "./components/DashboardSkeleton";
+import { EmptyState } from "./components/EmptyDashboard";
 function page() {
   const [allTransactions, setAllTransactions] = useState<
     transactionSchemaType | null | undefined
@@ -19,8 +21,6 @@ function page() {
       return;
     }
     const result = transactionSchema.safeParse(JSON.parse(transactions));
-    console.log("helllllllllllllllllllllllllllllll");
-    console.log(result);
     if (!result.success) {
       setAllTransactions(undefined);
       return;
@@ -28,12 +28,11 @@ function page() {
     setAllTransactions(JSON.parse(transactions) as transactionSchemaType);
   }, []);
   if (allTransactions === null) {
-    return <div>loading....</div>;
+    return <DashboardSkeleton />;
   }
   if (allTransactions === undefined) {
-    return <div>no transaction fund</div>;
+    return <EmptyState />;
   }
-  console.log("transactions", allTransactions);
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 font-sans md:p-8">
@@ -42,7 +41,7 @@ function page() {
         <div className="flex justify-between">
           <main className="space-y-6">
             <ChartBarMultiple transactions={allTransactions} />
-            <TopContacts transactions={allTransactions} />
+            <Contacts transactions={allTransactions} />
           </main>
 
           <ProfileSidebar transactions={allTransactions} />
