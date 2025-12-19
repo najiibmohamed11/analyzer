@@ -1,5 +1,9 @@
 /node_modules
 /.next/
-.env.sentry-build-plugin
 .env*
 .env.local
+.env.sentry-build-plugin
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
